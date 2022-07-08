@@ -1792,20 +1792,6 @@
         "value-path": "Schema"
       }
     },
-    "AdditionalVerificationParamsSchema": {
-      "description": "An object that represents the parameters for a specific recipient type.",
-      "type": "object",
-      "properties": {},
-      "x-ms-dynamic-schema": {
-        "operationId": "StaticResponseForVerificationTypeSchema",
-        "parameters": {
-          "verificationType": {
-            "parameter": "verificationType"
-          }
-        },
-        "value-path": "Schema"
-      }
-    },
     "AnchorTabSchema": {
       "description": "An object that represents the schema for a specific anchor tab.",
       "type": "object",
