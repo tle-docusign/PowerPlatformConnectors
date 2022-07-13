@@ -637,12 +637,8 @@
             "type": "string",
             "description": "Verification Type",
             "x-ms-summary": "Verification Type",
-            "x-ms-dynamic-values": {
-              "operationId": "StaticResponseForVerificationTypes",
-              "value-collection": "verificationTypes",
-              "value-path": "type",
-              "value-title": "name"
-            }
+            "enum":["None", "SMS", "Phone Call", "Knowledge-Based","ID Verification"],
+            "default": "None"
           },
           {
             "name":"routingOrder",
