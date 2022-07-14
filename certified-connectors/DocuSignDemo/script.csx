@@ -84,31 +84,6 @@ public class Script : ScriptBase
       response["tabTypes"] = tabTypesArray;
     }
 
-    if (operationId.Equals("StaticResponseForVerificationTypes", StringComparison.OrdinalIgnoreCase))
-    {
-      var verificationTypesArray = new JArray();
-
-      string [,] verificationTypes = {
-        {"accessCode", "Access Code"},
-        {"phoneCall", "Phone Call"},
-        {"SMS", "SMS"},
-        {"none", "None"},
-        {"knowledgeBased", "Knowledge-Based"},
-        {"idVerification", "ID Verification"}
-      };
-
-      for (var i = 0; i < verificationTypes.GetLength(0); i++){
-        var verificationObj = new JObject() 
-        {
-          ["type"] = verificationTypes[i,0],
-          ["name"] = verificationTypes[i,1]
-        };
-        verificationTypesArray.Add(verificationObj);
-      }
-
-      response["verificationTypes"] = verificationTypesArray;
-    }
-
     if (operationId.StartsWith("StaticResponseForFont", StringComparison.OrdinalIgnoreCase))
     {
       var fontNamesArray = new JArray();
@@ -251,13 +226,16 @@ public class Script : ScriptBase
         response["schema"]["properties"]["countryCode"] = new JObject 
         {
           ["type"] = "string",
-          ["x-ms-summary"] = "* Country Code"
+          ["x-ms-summary"] = "* Country Code",
         };
         response["schema"]["properties"]["phoneNumber"] = new JObject
         {
           ["type"] = "string",
-          ["x-ms-summary"] = "* Recipient's Phone Number"
+          ["x-ms-summary"] = "* Recipient's Phone Number",
         };
+      }
+      else {
+        response["schema"] = null;
       }
     }
 
@@ -566,7 +544,7 @@ public class Script : ScriptBase
     var verificationType = query.Get("verificationType");
     var type = verificationType.Substring(0,1);
 
-    if (type.Equals("P"))
+    if (verificationType.Equals("Phone Call"))
     {
       var phoneAuthentication = new JObject();
       phoneAuthentication["recipMayProvideNumber"] = false;
