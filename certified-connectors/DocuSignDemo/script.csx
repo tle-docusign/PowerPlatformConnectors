@@ -586,11 +586,6 @@ public class Script : ScriptBase
       signers[0]["idCheckConfigurationName"] = "SMS Auth $";
     }
   }
-// "x-ms-dynamic-values": {
-//               "operationId": "StaticResponseForVerificationTypes",
-//               "value-collection": "verificationTypes",
-//               "value-path": "type",
-//               "value-title": "name"
 
   private int GenerateId()
   {

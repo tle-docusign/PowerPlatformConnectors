@@ -637,7 +637,7 @@
             "type": "string",
             "description": "Verification Type",
             "x-ms-summary": "Verification Type",
-            "enum":["None", "SMS", "Phone Call", "Knowledge-Based","ID Verification", "Access Code"],
+            "enum":["None", "Access Code", "ID Verification", "Phone Call", "Knowledge-Based","SMS"],
             "default": "None"
           },
           {
@@ -1305,25 +1305,6 @@
         "x-ms-visibility": "internal"
       }
     },
-    "/verification_types": {
-      "get": {
-        "tags": [
-          "StaticResponse"
-        ],
-        "description": "Get verification types.",
-        "operationId": "StaticResponseForVerificationTypes",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/VerificationTypesResponse"
-            }
-          }
-        },
-        "deprecated": false,
-        "x-ms-visibility": "internal"
-      }
-    },
     "/anchortab_schema": {
       "get": {
         "tags": [
@@ -1907,19 +1888,6 @@
         }
       }
     },
-    "VerificationTypesResponse": {
-      "type": "object",
-      "properties" :{
-        "tabTypes": {
-          "description": "Verification Type",
-          "type":"array",
-          "items": {
-            "$ref":"#/definitions/VerificationType"
-          },
-          "x-ms-summary": "Verification Types"
-        }
-      }
-    },
     "FontNamesResponse": {
       "type": "object",
       "properties": {
@@ -1956,21 +1924,6 @@
           "description": "Type of the tab.",
           "type": "string",
           "x-ms-summary": "Type"
-        }
-      }
-    },
-    "VerificationType": {
-      "type": "object",
-      "properties":{
-        "name": {
-          "description":"Display name of the verification type.",
-          "type":"string",
-          "x-ms-summary":"Name"
-        },
-        "type": {
-          "description":"Type of verification.",
-          "type":"string",
-          "x-ms-summary":"Type"
         }
       }
     },
