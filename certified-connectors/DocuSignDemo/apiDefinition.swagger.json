@@ -637,7 +637,7 @@
             "type": "string",
             "description": "Verification Type",
             "x-ms-summary": "Verification Type",
-            "enum":["None", "SMS", "Phone Call", "Knowledge-Based","ID Verification"],
+            "enum":["None", "SMS", "Phone Call", "Knowledge-Based","ID Verification", "Access Code"],
             "default": "None"
           },
           {

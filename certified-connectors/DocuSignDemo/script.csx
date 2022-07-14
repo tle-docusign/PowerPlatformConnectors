@@ -246,7 +246,7 @@ public class Script : ScriptBase
         ["properties"] = new JObject()
       };
 
-      if (verificationType.Equals("phoneCall", StringComparison.OrdinalIgnoreCase) || verificationType.Equals("SMS", StringComparison.OrdinalIgnoreCase) )
+      if (verificationType.Equals("Phone Call", StringComparison.OrdinalIgnoreCase) || verificationType.Equals("SMS", StringComparison.OrdinalIgnoreCase) )
       {
         response["schema"]["properties"]["countryCode"] = new JObject 
         {
@@ -564,8 +564,9 @@ public class Script : ScriptBase
   {
     var query = HttpUtility.ParseQueryString(this.Context.Request.RequestUri.Query);
     var verificationType = query.Get("verificationType");
+    var type = verificationType.Substring(0,1);
 
-    if (verificationType.Equals("Phone+Call"))
+    if (type.Equals("P"))
     {
       var phoneAuthentication = new JObject();
       phoneAuthentication["recipMayProvideNumber"] = false;
