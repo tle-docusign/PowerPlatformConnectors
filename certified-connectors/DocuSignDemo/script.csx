@@ -221,24 +221,75 @@ public class Script : ScriptBase
         ["properties"] = new JObject()
       };
 
-      if (verificationType.Equals("Phone Call", StringComparison.OrdinalIgnoreCase) || verificationType.Equals("SMS", StringComparison.OrdinalIgnoreCase) )
+      if (verificationType.Equals("Phone Authentication", StringComparison.OrdinalIgnoreCase))
       {
         response["schema"]["properties"]["countryCode"] = new JObject 
         {
           ["type"] = "string",
-          ["x-ms-summary"] = "* Country Code",
+          ["x-ms-summary"] = "* Country Code (+)"
         };
         response["schema"]["properties"]["phoneNumber"] = new JObject
         {
           ["type"] = "string",
           ["x-ms-summary"] = "* Recipient's Phone Number",
         };
+        response["schema"]["properties"]["workflowID"] = new JObject
+        {
+          ["type"] = "string",
+          ["x-ms-dynamic-values"] = new JObject
+            {
+              ["operationId"] = "GetWorkflowIDs",
+              ["parameters"] = new JObject
+              {
+                ["accountId"] = new JObject
+                {
+                  ["parameter"] = "accountId"
+                }
+              },
+              ["value-collection"] = "workFlowIds",
+              ["value-path"] = "type",
+              ["value-title"] = "name",
+            },
+          ["x-ms-summary"] = "* Workflow IDs"
+        };
+      }
+      else if (verificationType.Equals("Access Code", StringComparison.OrdinalIgnoreCase))
+      {
+        response["schema"]["properties"]["accessCode"] = new JObject
+        {
+          ["type"] = "string",
+          ["x-ms-summary"] = "* Access Code"
+        };
+      }
+      else if (verificationType.Equals("ID Verification", StringComparison.OrdinalIgnoreCase))
+      {
+        response["schema"]["properties"]["workflowID"] = new JObject
+        {
+          ["type"] = "string",
+          ["x-ms-dynamic-values"] = new JObject
+            {
+              ["operationId"] = "GetWorkflowIDs",
+              ["parameters"] = new JObject
+              {
+                ["accountId"] = new JObject
+                {
+                  ["parameter"] = "accountId"
+                }
+              },
+              ["value-collection"] = "workFlowIds",
+              ["value-path"] = "type",
+              ["value-title"] = "name",
+            },
+          ["x-ms-summary"] = "* Workflow IDs"
+        };
+      }
+      else {
+        response["schema"] = null;
       }
       else {
         response["schema"] = null;
       }
     }
-
     return CreateJsonContent(response.ToString());
   }
 
@@ -529,7 +580,7 @@ public class Script : ScriptBase
   private void AddCoreRecipientParams(JArray signers, JObject body) 
   {
     var query = HttpUtility.ParseQueryString(this.Context.Request.RequestUri.Query);
-    signers[0]["recipientId"] = GenerateId();
+    signers[0]["recipientId"] = Guid.NewGuid();
     if (!string.IsNullOrEmpty(query.Get("routingOrder")))
     {
       signers[0]["routingOrder"] = query.Get("routingOrder");
@@ -544,33 +595,41 @@ public class Script : ScriptBase
     var verificationType = query.Get("verificationType");
     var type = verificationType.Substring(0,1);
 
-    if (verificationType.Equals("Phone Call"))
+    if (verificationType.Equals("Phone Authentication"))
     {
-      var phoneAuthentication = new JObject();
-      phoneAuthentication["recipMayProvideNumber"] = false;
-      var senderProvidedNumbers = new JArray();
-      senderProvidedNumbers.Add(body["phoneNumber"]);
-      phoneAuthentication["senderProvidedNumbers"] = senderProvidedNumbers;
-      signers[0]["phoneAuthentication"] = phoneAuthentication;
-      signers[0]["idCheckConfigurationName"] = "Phone Auth $";
-    }
-    else if (verificationType.Equals("SMS"))
-    {
-      var smsAuthentication = new JObject();
-      var senderProvidedNumbers = new JArray();
-      senderProvidedNumbers.Add(body["phoneNumber"]);
-      smsAuthentication["senderProvidedNumbers"] = senderProvidedNumbers;
-      signers[0]["smsAuthentication"] = smsAuthentication;
-      signers[0]["idCheckConfigurationName"] = "SMS Auth $";
-    }
-  }
+      var identityVerification = new JObject();
+      var inputOptions = new JArray();
+      var inputObject = new JObject();
+      var phoneNumberList = new JArray();
+      var phoneNumberObject = new JObject();
 
-  private int GenerateId()
-  {
-    DateTimeOffset now = DateTimeOffset.UtcNow;
-    DateTime midnight = DateTime.Now.Date;
-    TimeSpan ts = now.Subtract(midnight);
-    return (int)ts.TotalMilliseconds;
+      phoneNumberObject["Number"] = body["phoneNumber"];
+      phoneNumberObject["CountryCode"] = body["countryCode"];
+      phoneNumberList.Add(phoneNumberObject);
+
+      inputObject["phoneNumberList"] = phoneNumberList;
+      inputObject["name"] = "phone_number_list";
+      inputObject["valueType"] = "PhoneNumberList";
+      inputOptions.Add(inputObject);
+
+      identityVerification["workflowId"] = body["workflowID"];
+      identityVerification["inputOptions"] = inputOptions;
+      signers[0]["identityVerification"] = identityVerification;
+    }
+    else if (verificationType.Equals("Access Code"))
+    {
+      signers[0]["accessCode"] = body["accessCode"];
+    }
+    else if (verificationType.Equals("Knowledge Based"))
+    {
+      signers[0]["idCheckConfigurationName"] = "ID Check $";
+    }
+    else if (verificationType.Equals("ID Verification"))
+    {
+      var identityVerification = new JObject();
+      identityVerification["workflowId"] = body["workflowID"];
+      signers[0]["identityVerification"] = identityVerification;
+    }
   }
 
   private int GenerateDocumentId()
@@ -801,6 +860,23 @@ public class Script : ScriptBase
           "{0}/{1}",
           this.Context.OriginalRequestUri.ToString(),
           body.GetValue("connectId").ToString()));
+    }
+
+    if ("GetWorkflowIds".Equals(this.Context.OperationId, StringComparison.OrdinalIgnoreCase))
+    {
+      var body = ParseContentAsJObject(await response.Content.ReadAsStringAsync().ConfigureAwait(false), false);
+      var workflowsArray = new JArray();
+
+      foreach (var id in (body["identityVerification"] as JArray)) {
+        var workflowObj = new JObject()
+        {
+          ["type"] = id["workflowId"],
+          ["name"] = id["defaultName"]
+        };
+        workflowsArray.Add(workflowObj);
+      }
+      body["workflowIds"] = workflowsArray;
+      response.Content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
     }
 
     if ("GetDynamicSigners".Equals(this.Context.OperationId, StringComparison.OrdinalIgnoreCase))
