@@ -479,6 +479,68 @@
         "x-ms-visibility": "important"
       }
     },
+    "/accounts/{accountId}/envelopes/{envelopeId}/settings": {
+      "get": {
+        "tags": [
+          "DocuSign"
+        ],
+        "summary": "Envelope advanced sending settings",
+        "description": "Envelope advanced sending settings",
+        "operationId": "EnvelopeAdvancedSendingSettings",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters":[
+          {
+            "name": "accountId",
+            "in": "path",
+            "description": "Account id",
+            "required": true,
+            "x-ms-summary": "Account",
+            "x-ms-test-value": "insert account id",
+            "x-ms-dynamic-values": {
+              "operationId": "GetLoginAccounts",
+              "value-collection": "loginAccounts",
+              "value-path": "accountIdGuid",
+              "value-title": "name"
+            },
+            "type": "string"
+          },
+          {
+            "name": "envelopeId",
+            "in": "path",
+            "description": "Envelope id",
+            "required": true,
+            "x-ms-summary": "Envelope",
+            "x-ms-test-value": "insert envelope id",
+            "type": "string"
+          },
+          {
+            "name": "advancedSettings",
+            "in": "body",
+            "description": "advanced Settings",
+            "schema": {
+              "$ref": "#/definitions/advancedSettings"
+            },
+            "x-ms-summary": "Advanced Settings",
+            "x-ms-visibility": "advanced"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "schema": {}
+          }
+        },
+        "deprecated":false,
+        "x-ms-visibility": "important",
+        "x-ms-no-generic-test": true
+      }
+    },
     "/accounts/{accountId}/envelopes/{envelopeId}/views/sender": {
       "post": {
         "tags":[
@@ -2226,6 +2288,20 @@
         }
       }
     },
+    "advancedSettings": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "description": "Advanced Sending Settings",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/setting"
+          },
+          "x-ms-summary": "Advanced Settings",
+          "x-ms-visibility": "advanced"
+        }
+      }
+    },
     "LoginAccount": {
       "required": [
         "accountIdGuid"
@@ -2325,6 +2401,21 @@
           "type": "string",
           "x-ms-summary": "Type",
           "x-ms-visibility": "advanced"
+        }
+      }
+    },
+    "setting": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of setting option",
+          "type":"string",
+          "x-ms-summary": "Name"
+        },
+        "value": {
+          "description": "The value of setting option",
+          "type":"string",
+          "x-ms-summary": "Value"
         }
       }
     },
