@@ -987,6 +987,25 @@ public class Script : ScriptBase
       response.Content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
     }
 
+    if ("GetAdvancedSendingSettings".Equals(this.Context.OperationId, StringComparison.OrdinalIgnoreCase))
+    {
+      var body = ParseContentAsJObject(await response.Content.ReadAsStringAsync().ConfigureAwait(false), false);
+      var settingsArray = new JArray();
+
+      if (body.ContainsKey("enableWetSign"))
+      {
+        var settingObj = new JObject()
+        {
+          ["name"] = "Allow recipients to sign on paper",
+          ["value"] = body["enableWetSign"]
+        };
+        settingsArray.Add(settingObj);
+      }
+      
+      body["settings"] = settingsArray;
+      response.Content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
+    }
+
     if ("GetWorkflowIds".Equals(this.Context.OperationId, StringComparison.OrdinalIgnoreCase))
     {
       var body = ParseContentAsJObject(await response.Content.ReadAsStringAsync().ConfigureAwait(false), false);

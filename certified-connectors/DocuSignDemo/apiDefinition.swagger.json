@@ -464,6 +464,16 @@
             "x-ms-summary": "Envelope",
             "x-ms-test-value": "insert envelope id",
             "type": "string"
+          },
+          {
+            "name": "advancedSendingSettings",
+            "in":"body",
+            "description": "Advanced Sending Settings",
+            "schema": {
+              "$ref":"#/definitions/AdvancedSendingSettings"
+            },
+            "x-ms-summary": "Advanced Sending Settings",
+            "x-ms-visibility": "advanced"
           }
         ],
         "responses": {
@@ -486,7 +496,7 @@
         ],
         "summary": "Envelope advanced sending settings",
         "description": "Envelope advanced sending settings",
-        "operationId": "EnvelopeAdvancedSendingSettings",
+        "operationId": "GetAdvancedSendingSettings",
         "consumes": [],
         "produces": [
           "application/json",
@@ -518,27 +528,18 @@
             "x-ms-summary": "Envelope",
             "x-ms-test-value": "insert envelope id",
             "type": "string"
-          },
-          {
-            "name": "advancedSettings",
-            "in": "body",
-            "description": "advanced Settings",
-            "schema": {
-              "$ref": "#/definitions/advancedSettings"
-            },
-            "x-ms-summary": "Advanced Settings",
-            "x-ms-visibility": "advanced"
           }
         ],
         "responses": {
           "201": {
             "description": "OK",
-            "schema": {}
+            "schema": {
+              "$ref": "#/definitions/GetAdvancedSettings"
+            }
           }
         },
         "deprecated":false,
-        "x-ms-visibility": "important",
-        "x-ms-no-generic-test": true
+        "x-ms-visibility": "internal"
       }
     },
     "/accounts/{accountId}/envelopes/{envelopeId}/views/sender": {
@@ -1716,6 +1717,27 @@
         "x-ms-visibility": "internal"
       }
     },
+    "/settings_schema": {
+      "get": {
+        "tags":[
+          "StaticResponse"
+        ],
+        "description": "Get Advanced Sending Settings",
+        "operationId": "StaticResponseForSettingsSchema",
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        },
+        "deprecated": false,
+        "x-ms-visibility": "internal"
+      }
+    },
     "/verificationtype_schema": {
       "get": {
         "tags": [
@@ -2061,6 +2083,16 @@
         "value-path":"Schema"
       }
     },
+    "AdvancedSendingSettings": {
+      "description": "An object that represents advanced sending settings of envelope.",
+      "type": "object",
+      "properties": {},
+      "x-ms-dynamic-schema": {
+        "operationId": "StaticResponseForSettingsSchema",
+        "parameters": {},
+        "value-path":"Schema"
+      }
+    },
     "AdditionalURLForSenderView": {
       "description": "Addtional Return URL",
       "type": "object",
@@ -2288,7 +2320,7 @@
         }
       }
     },
-    "advancedSettings": {
+    "GetAdvancedSettings": {
       "type": "object",
       "properties": {
         "settings": {
