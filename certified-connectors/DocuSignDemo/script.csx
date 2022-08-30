@@ -277,8 +277,9 @@ public class Script : ScriptBase
       {
         response["schema"]["properties"]["setting"] = new JObject
         {
-          ["type"] = "string",
-          ["x-ms-dynamic-values"] = new JObject
+          // ["type"] = "string",
+          // ["x-ms-dynamic-values"] = new JObject
+          var settingsObject = new JObject
             {
               ["operationId"] = "GetAdvancedSendingSettings",
               ["parameters"] = new JObject
@@ -291,8 +292,16 @@ public class Script : ScriptBase
               ["value-collection"] = "settings",
               ["value-title"] = "name",
             },
-          ["x-ms-summary"] = "* Settings"
-        };
+          foreach (var setting in settingObj as JArray)) 
+          {
+              var workflowObj = new JObject()
+              {
+                ["type"] = id["workflowId"],
+                ["name"] = id["defaultName"]
+              };
+          }
+            // ["x-ms-summary"] = "* Settings"
+          };
       }
       else 
       {
