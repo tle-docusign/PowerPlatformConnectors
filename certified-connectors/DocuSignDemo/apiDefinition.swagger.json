@@ -466,6 +466,15 @@
             "type": "string"
           },
           {
+            "name": "setting",
+            "in": "query",
+            "description": "Advanced Settings",
+            "required": true,
+            "x-ms-summary": "Change Settings",
+            "type": "boolean",
+            "default": "false"
+          },
+          {
             "name": "advancedSendingSettings",
             "in":"body",
             "description": "Advanced Sending Settings",
@@ -489,7 +498,7 @@
         "x-ms-visibility": "important"
       }
     },
-    "/accounts/{accountId}/envelopes/{envelopeId}/settings": {
+    "/accounts/{accountId}": {
       "get": {
         "tags": [
           "DocuSign"
@@ -518,15 +527,6 @@
               "value-path": "accountIdGuid",
               "value-title": "name"
             },
-            "type": "string"
-          },
-          {
-            "name": "envelopeId",
-            "in": "path",
-            "description": "Envelope id",
-            "required": true,
-            "x-ms-summary": "Envelope",
-            "x-ms-test-value": "insert envelope id",
             "type": "string"
           }
         ],
@@ -1725,6 +1725,13 @@
         "description": "Get Advanced Sending Settings",
         "operationId": "StaticResponseForSettingsSchema",
         "parameters": [
+          {
+            "name": "setting",
+            "in": "query",
+            "required": true,
+            "type": "boolean",
+            "x-ms-summary": "Advanced Setting"
+          }
         ],
         "responses": {
           "200": {
@@ -2089,7 +2096,11 @@
       "properties": {},
       "x-ms-dynamic-schema": {
         "operationId": "StaticResponseForSettingsSchema",
-        "parameters": {},
+        "parameters": {
+          "setting": {
+            "parameter": "setting"
+          }
+        },
         "value-path":"Schema"
       }
     },

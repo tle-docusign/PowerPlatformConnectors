@@ -260,6 +260,46 @@ public class Script : ScriptBase
       }
     }
 
+    if (operationId.Equals("StaticResponseForSettingsSchema", StringComparison.OrdinalIgnoreCase))
+    {
+      var query = HttpUtility.ParseQueryString(context.Request.RequestUri.Query);
+      var setting = query.Get("setting");
+
+      response["name"] = "dynamicSchema";
+      response["title"] = "dynamicSchema";
+      response["schema"] = new JObject
+      {
+        ["type"] = "object",
+        ["properties"] = new JObject()
+      };
+
+      if (setting.Equals("true", StringComparison.OrdinalIgnoreCase))
+      {
+        response["schema"]["properties"]["setting"] = new JObject
+        {
+          ["type"] = "string",
+          ["x-ms-dynamic-values"] = new JObject
+            {
+              ["operationId"] = "GetAdvancedSendingSettings",
+              ["parameters"] = new JObject
+              {
+                ["accountId"] = new JObject
+                {
+                  ["parameter"] = "accountId"
+                }
+              },
+              ["value-collection"] = "settings",
+              ["value-title"] = "name",
+            },
+          ["x-ms-summary"] = "* Settings"
+        };
+      }
+      else 
+      {
+        response["schema"] = null;
+      }
+    }
+
     if (operationId.Equals("StaticResponseForVerificationTypeSchema", StringComparison.OrdinalIgnoreCase))
     {
       var query = HttpUtility.ParseQueryString(context.Request.RequestUri.Query);
@@ -929,6 +969,15 @@ public class Script : ScriptBase
       this.Context.Request.RequestUri = uriBuilder.Uri;
     }
 
+    if ("GetAdvancedSendingSettings".Equals(this.Context.OperationId, StringComparison.OrdinalIgnoreCase))
+    {
+      var uriBuilder = new UriBuilder(this.Context.Request.RequestUri);
+      var query = HttpUtility.ParseQueryString(this.Context.Request.RequestUri.Query);
+      query["include_account_settings"] = "true";
+      uriBuilder.Query = query.ToString();
+      this.Context.Request.RequestUri = uriBuilder.Uri;
+    }
+
     if ("GetLoginAccounts".Equals(this.Context.OperationId, StringComparison.OrdinalIgnoreCase))
     {
       var uriBuilder = new UriBuilder(this.Context.Request.RequestUri);
@@ -991,17 +1040,17 @@ public class Script : ScriptBase
     {
       var body = ParseContentAsJObject(await response.Content.ReadAsStringAsync().ConfigureAwait(false), false);
       var settingsArray = new JArray();
+      var accountSetting = body["accountSettings"] as JObject;
 
-      if (body.ContainsKey("enableWetSign"))
+      if (accountSetting.ContainsKey("enableSignOnPaper"))
       {
         var settingObj = new JObject()
         {
           ["name"] = "Allow recipients to sign on paper",
-          ["value"] = body["enableWetSign"]
+          ["value"] = body["enableSignOnPaper"]
         };
         settingsArray.Add(settingObj);
       }
-      
       body["settings"] = settingsArray;
       response.Content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
     }
