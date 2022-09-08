@@ -1047,6 +1047,8 @@ public class Script : ScriptBase
 
     if (verificationType.Equals("Phone Authentication"))
     {
+      try
+      {
       var identityVerification = new JObject();
       var inputOptions = new JArray();
       var inputObject = new JObject();
@@ -1065,10 +1067,29 @@ public class Script : ScriptBase
       identityVerification["workflowId"] = body["workflowID"];
       identityVerification["inputOptions"] = inputOptions;
       recipient["identityVerification"] = identityVerification;
+      }
+      catch
+      {
+
+      }
     }
     else if (verificationType.Equals("Access Code"))
     {
-      recipient["accessCode"] = body["accessCode"];
+      try
+      {
+        if (!string.IsNullOrEmpty((body["accessCode"]).ToString()))
+        {
+          recipient["accessCode"] = body["accessCode"];
+        }
+        else
+        {
+          throw new Exception("The access code is missing");
+        }
+      }
+      catch
+      {
+        throw new Exception("The access code is missing");
+      }   
     }
     else if (verificationType.Equals("Knowledge Based"))
     {
