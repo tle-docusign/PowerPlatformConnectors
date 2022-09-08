@@ -1049,28 +1049,33 @@ public class Script : ScriptBase
     {
       try
       {
-      var identityVerification = new JObject();
-      var inputOptions = new JArray();
-      var inputObject = new JObject();
-      var phoneNumberList = new JArray();
-      var phoneNumberObject = new JObject();
+        var identityVerification = new JObject();
+        var inputOptions = new JArray();
+        var inputObject = new JObject();
+        var phoneNumberList = new JArray();
+        var phoneNumberObject = new JObject();
 
-      phoneNumberObject["Number"] = body["phoneNumber"];
-      phoneNumberObject["CountryCode"] = body["countryCode"];
-      phoneNumberList.Add(phoneNumberObject);
+        phoneNumberObject["Number"] = body["phoneNumber"];
+        phoneNumberObject["CountryCode"] = body["countryCode"];
+        phoneNumberList.Add(phoneNumberObject);
 
-      inputObject["phoneNumberList"] = phoneNumberList;
-      inputObject["name"] = "phone_number_list";
-      inputObject["valueType"] = "PhoneNumberList";
-      inputOptions.Add(inputObject);
+        inputObject["phoneNumberList"] = phoneNumberList;
+        inputObject["name"] = "phone_number_list";
+        inputObject["valueType"] = "PhoneNumberList";
+        inputOptions.Add(inputObject);
 
-      identityVerification["workflowId"] = body["workflowID"];
-      identityVerification["inputOptions"] = inputOptions;
-      recipient["identityVerification"] = identityVerification;
+        identityVerification["workflowId"] = body["workflowID"];
+        identityVerification["inputOptions"] = inputOptions;
+        recipient["identityVerification"] = identityVerification;
+
+        if (string.IsNullOrEmpty((body["phoneNumber"]).ToString()) || string.IsNullOrEmpty((body["countryCode"]).ToString()) || string.IsNullOrEmpty((body["workflowID"]).ToString()))
+        {
+          throw new Exception();
+        }
       }
       catch
       {
-
+        throw new Exception ("Phone number or workflowID is missing");
       }
     }
     else if (verificationType.Equals("Access Code"))
