@@ -1075,20 +1075,17 @@ public class Script : ScriptBase
       }
       catch
       {
-        throw new Exception ("Phone number or workflowID is missing");
+        throw new Exception ("Phone number or workflow ID is missing");
       }
     }
     else if (verificationType.Equals("Access Code"))
     {
       try
       {
-        if (!string.IsNullOrEmpty((body["accessCode"]).ToString()))
+        recipient["accessCode"] = body["accessCode"];
+        if (string.IsNullOrEmpty((body["accessCode"]).ToString()))
         {
-          recipient["accessCode"] = body["accessCode"];
-        }
-        else
-        {
-          throw new Exception("The access code is missing");
+          throw new Exception();
         }
       }
       catch
@@ -1102,11 +1099,21 @@ public class Script : ScriptBase
     }
     else if (verificationType.Equals("ID Verification"))
     {
-      var identityVerification = new JObject();
-      identityVerification["workflowId"] = body["workflowID"];
-      recipient["identityVerification"] = identityVerification;
+      try
+      {
+        var identityVerification = new JObject();
+        identityVerification["workflowId"] = body["workflowID"];
+        recipient["identityVerification"] = identityVerification;
+        if (string.IsNullOrEmpty((body["workflowID"]).ToString()))
+        {
+          throw new Exception();
+        }
+      }
+      catch
+      {
+        throw new Exception ("Workflow ID is missing");
+      }
     }
-    
     recipient["recipientId"] = recipientId;
     recipientArray.Add(recipient);
     body[recipientType] = recipientArray;
