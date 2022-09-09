@@ -1027,17 +1027,41 @@ public class Script : ScriptBase
     var verificationType = query.Get("verificationType");
     var recipientType = query.Get("recipientType");
 
-    if (recipientType.Equals("agent") || recipientType.Equals("editor") || recipientType.Equals("inPersonSigner") || recipientType.Equals("participant") || recipientType.Equals("seal") || recipientType.Equals("signer"))
+    if (recipientType.Equals("agent"))
     {
-      recipientType = recipientType + "s";
+      recipientType = "agents";
     }
-    else if (recipientType.Equals("witness"))
+    else if (recipientType.Equals("editor"))
     {
-      recipientType = recipientType + "es";
+      recipientType = "editors";
     }
-    else
+    else if (recipientType.Equals("inPersonSigner"))
     {
-      recipientType = recipientType.Replace("y", "ies");
+      recipientType = "inPersonSigners";
+    }
+    else if (recipientType.Equals("participant"))
+    {
+      recipientType = "participants";
+    }
+    else if (recipientType.Equals("seal"))
+    {
+      recipientType = "seals";
+    }
+    else if (recipientType.Equals("signer"))
+    {
+      recipientType = "signers";
+    }
+    else if (recipientType.Equals("carbonCopy"))
+    {
+      recipientType = "carbonCopies";
+    }
+    else if (recipientType.Equals("intermediary"))
+    {
+      recipientType = "intermediaries";
+    }
+    else 
+    {
+      recipientType = "witnesses";
     }
 
     var recipientId = query.Get("recipientId");
@@ -1047,24 +1071,29 @@ public class Script : ScriptBase
 
     if (verificationType.Equals("Phone Authentication"))
     {
-      var identityVerification = new JObject();
-      var inputOptions = new JArray();
-      var inputObject = new JObject();
-      var phoneNumberList = new JArray();
-      var phoneNumberObject = new JObject();
+        var identityVerification = new JObject();
+        var inputOptions = new JArray();
+        var inputObject = new JObject();
+        var phoneNumberList = new JArray();
+        var phoneNumberObject = new JObject();
 
-      phoneNumberObject["Number"] = body["phoneNumber"];
-      phoneNumberObject["CountryCode"] = body["countryCode"];
-      phoneNumberList.Add(phoneNumberObject);
+        phoneNumberObject["Number"] = body["phoneNumber"];
+        phoneNumberObject["CountryCode"] = body["countryCode"];
+        phoneNumberList.Add(phoneNumberObject);
 
-      inputObject["phoneNumberList"] = phoneNumberList;
-      inputObject["name"] = "phone_number_list";
-      inputObject["valueType"] = "PhoneNumberList";
-      inputOptions.Add(inputObject);
+        inputObject["phoneNumberList"] = phoneNumberList;
+        inputObject["name"] = "phone_number_list";
+        inputObject["valueType"] = "PhoneNumberList";
+        inputOptions.Add(inputObject);
 
-      identityVerification["workflowId"] = body["workflowID"];
-      identityVerification["inputOptions"] = inputOptions;
-      recipient["identityVerification"] = identityVerification;
+        identityVerification["workflowId"] = body["workflowID"];
+        identityVerification["inputOptions"] = inputOptions;
+        recipient["identityVerification"] = identityVerification;
+
+        if (body["phoneNumber"] == null || body["countryCode"] == null || body["workflowID"] == null)
+        {
+          throw new Exception ("Phone number or workflow ID is missing");
+        }
     }
     else if (verificationType.Equals("Access Code"))
     {
@@ -1079,8 +1108,11 @@ public class Script : ScriptBase
       var identityVerification = new JObject();
       identityVerification["workflowId"] = body["workflowID"];
       recipient["identityVerification"] = identityVerification;
+      if (body["workflowID"] == null)
+      {
+        throw new Exception("Workflow ID is missing");
+      }
     }
-    
     recipient["recipientId"] = recipientId;
     recipientArray.Add(recipient);
     body[recipientType] = recipientArray;
